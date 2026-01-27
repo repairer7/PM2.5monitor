@@ -1,4 +1,4 @@
-cname: Air Quality Monitor
+name: Air Quality Monitor
 
 on:
   schedule:
