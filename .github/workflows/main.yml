@@ -30,10 +30,9 @@ jobs:
 
       - name: Run script
         env:
-          BARK_HOST: ${{ secrets.BARK_HOST }}
+          BARK_SERVER: ${{ secrets.BARK_SERVER }}
           BARK_KEY: ${{ secrets.BARK_KEY }}
-        run: |
-          python PM2.5monitor.py
+        run: python PM2.5monitor.py
 
       - name: Commit & Push data
         run: |
