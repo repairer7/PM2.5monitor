@@ -46,7 +46,7 @@ df['timepoint'] = (
 if len(df['timepoint'].unique()) > 1:
     for t in df['timepoint'].unique():
         timestamp = t[:13]
-        daily_folder = Path('/root/Error') / timestamp[:10]
+        daily_folder = Path('/data/Error') / timestamp[:10]
         daily_folder.mkdir(parents=True, exist_ok=True)
         df.to_csv(daily_folder / (timestamp + '.csv'), index=None)
 
@@ -62,7 +62,7 @@ df_ = df_.where(df_ != '—', np.nan)
 
 # 保存到 Archive
 timestamp = df['timepoint'].unique()[-1][:13]
-daily_folder = Path('/root/Archive') / timestamp[:10]
+daily_folder = Path('data') / timestamp[:10]
 daily_folder.mkdir(parents=True, exist_ok=True)
 
 csv_path = daily_folder / (timestamp + '.csv')
@@ -117,3 +117,4 @@ if not high_df.empty:
     send_notice(content, title="出现高值站点")
 else:
     print("无高值站点")
+
