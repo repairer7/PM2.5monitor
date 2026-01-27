@@ -2,22 +2,21 @@ name: Air Quality Monitor
 
 on:
   schedule:
-    # 每小时的第 20 分运行一次（UTC 时间）
-    # 北京时间 = UTC + 8
-    # 如果你希望北京时间每小时 20 分运行，则 UTC 应该是每小时的 12 分
     - cron: "20 * * * *"
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  run-scripts:
+  run-monitor:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,6 +28,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run air monitor script
+      - name: Run script
         run: |
           python PM2.5monitor.py
+
+      - name: Commit & Push data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add data/
+          git commit -m "Update air data at $(date '+%Y-%m-%d %H:%M')" || echo "No changes to commit"
+          git push
