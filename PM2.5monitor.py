@@ -95,7 +95,7 @@ pm2_5average = df2['pm2_5'].mean()
 df2['diff'] = df2['pm2_5'] - pm2_5average
 
 # 筛选高值站点
-high_df = df2[df2['diff'] > 3]
+high_df = df2[df2['diff'] > 5]
 
 # 生成推送内容（换行格式）
 content = "\n".join(
@@ -122,6 +122,7 @@ if not high_df.empty:
     send_notice(content, title="出现高值站点")
 else:
     print("无高值站点")
+
 
 
 
