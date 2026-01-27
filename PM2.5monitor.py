@@ -105,12 +105,20 @@ content = "\n".join(
 
 # Bark 推送
 def send_notice(content, title="消息提醒"):
-    bark_host = os.getenv("BARK_HOST")
-    bark_key = os.getenv("BARK_KEY")
+    # 1. 从环境变量获取私有配置
+    # 如果本地运行没有设置环境变量，可以给一个空值或抛出错误
+    bark_server = os.environ.get("BARK_SERVER") 
+    bark_key = os.environ.get("BARK_KEY")
+
+    if not bark_server or not bark_key:
+        print("错误: 未找到 BARK_SERVER 或 BARK_KEY 环境变量")
+        return
+
     content_encoded = urllib.parse.quote(str(content))
     title_encoded = urllib.parse.quote(str(title))
-    url = f"https://{bark_host}/{bark_key}/{title_encoded}/{content_encoded}?group=高值站点警告"
-    print("请求 URL:", url)
+    
+    url = f"https://{bark_server}/{bark_key}/{title_encoded}/{content_encoded}?group=大气站点监控"
+    
     try:
         response = requests.get(url, timeout=5)
         print("Bark 返回:", response.text)
@@ -122,6 +130,7 @@ if not high_df.empty:
     send_notice(content, title="出现高值站点")
 else:
     print("无高值站点")
+
 
 
 
