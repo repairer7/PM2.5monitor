@@ -6,6 +6,7 @@ import numpy as np
 from pathlib import Path
 import datetime
 import urllib.parse
+import os
 
 requests.packages.urllib3.disable_warnings()
 
@@ -120,6 +121,7 @@ if not high_df.empty:
     send_notice(content, title="出现高值站点")
 else:
     print("无高值站点")
+
 
 
 
