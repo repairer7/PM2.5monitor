@@ -109,7 +109,8 @@ def send_notice(content, title="消息提醒"):
     bark_key = os.getenv("BARK_KEY")
     content_encoded = urllib.parse.quote(str(content))
     title_encoded = urllib.parse.quote(str(title))
-    url = f"https://{bark_host}/{bark_key}/{title_encoded}/{content_encoded}?group=大气站点监控"
+    url = f"https://{bark_host}/{bark_key}/{title_encoded}/{content_encoded}?group=高值站点警告"
+    print("请求 URL:", url)
     try:
         response = requests.get(url, timeout=5)
         print("Bark 返回:", response.text)
@@ -121,6 +122,7 @@ if not high_df.empty:
     send_notice(content, title="出现高值站点")
 else:
     print("无高值站点")
+
 
 
 
