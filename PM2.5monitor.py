@@ -95,7 +95,7 @@ pm2_5average = df2['pm2_5'].mean()
 df2['diff'] = df2['pm2_5'] - pm2_5average
 
 # 筛选高值站点
-high_df = df2[df2['diff'] > 5]
+high_df = df2[df2['diff'] > 8]
 
 # 生成推送内容（换行格式）
 content = "\n".join(
@@ -105,9 +105,7 @@ content = "\n".join(
 
 # Bark 推送
 def send_notice(content, title="消息提醒"):
-    # 1. 从环境变量获取私有配置
-    # 如果本地运行没有设置环境变量，可以给一个空值或抛出错误
-    bark_server = os.environ.get("BARK_SERVER") 
+    bark_server = os.environ.get("BARK_SERVER")
     bark_key = os.environ.get("BARK_KEY")
 
     if not bark_server or not bark_key:
@@ -116,20 +114,39 @@ def send_notice(content, title="消息提醒"):
 
     content_encoded = urllib.parse.quote(str(content))
     title_encoded = urllib.parse.quote(str(title))
-    
     url = f"https://{bark_server}/{bark_key}/{title_encoded}/{content_encoded}?group=大气站点监控"
-    
-    try:
-        response = requests.get(url, timeout=5)
-        print("Bark 返回:", response.text)
-    except Exception as e:
-        print("推送失败:", e)
 
+    # --- 重试机制开始 ---
+    max_retries = 3  # 最大重试次数
+    for attempt in range(1, max_retries + 1):
+        try:
+            # 增加 timeout 时间，防止因为太慢而报错
+            response = requests.get(url, timeout=10)
+            
+            # 检查 HTTP 状态码，如果不是 200 也视为失败
+            if response.status_code == 200:
+                print(f"Bark 推送成功: {response.text}")
+                return # 成功后直接结束函数
+            else:
+                print(f"Bark 返回非 200 状态: {response.status_code}")
+                
+        except Exception as e:
+            print(f"第 {attempt} 次推送失败: {e}")
+        
+        # 如果还没到最后一次尝试，就等待一会儿再试
+        if attempt < max_retries:
+            wait_time = 5 * attempt # 第一次等5秒，第二次等10秒...
+            print(f"等待 {wait_time} 秒后重试...")
+            time.sleep(wait_time)
+    
+    print("重试多次后仍然失败，放弃推送。")
+    # --- 重试机制结束 ---
 
 if not high_df.empty:
     send_notice(content, title="出现高值站点")
 else:
     print("无高值站点")
+
 
 
 
