@@ -1,8 +1,6 @@
 name: Air Quality Monitor
 
 on:
-  schedule:
-    - cron: "20 * * * *"
   workflow_dispatch:
 
 permissions:
